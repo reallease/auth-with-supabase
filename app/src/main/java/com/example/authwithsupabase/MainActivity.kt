@@ -12,8 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -29,7 +28,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.authwithsupabase.data.model.UserState
+import com.example.authwithsupabase.ui.screens.SignIn
 import com.example.authwithsupabase.ui.theme.AuthWithSupabaseTheme
 
 class MainActivity : ComponentActivity() {
@@ -38,11 +41,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AuthWithSupabaseTheme {
-                Surface (
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MainScreen()
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    val navController = rememberNavController()
+                    NavHost(navController = navController, startDestination = "main") {
+                        composable("main") {
+                            ScreenMain(modifier = Modifier.padding(innerPadding))
+                        }
+                        composable("signIn") {
+                            SignIn()
+                        }
+                    }
                 }
             }
         }
@@ -128,23 +136,32 @@ class MainActivity : ComponentActivity() {
                 Text(text = "Logout")
             }
 
-            when(userState) {
+            when (userState) {
                 is UserState.Loading -> {
                     LoadingComponent()
                 }
+
                 is UserState.Success -> {
                     val message = (userState as UserState.Success).message
                     currentUserState = message
                 }
+
                 is UserState.Error -> {
                     val message = (userState as UserState.Error).message
                     currentUserState = message
                 }
             }
 
-            if(currentUserState.isNotEmpty()) {
+            if (currentUserState.isNotEmpty()) {
                 Text(text = currentUserState)
             }
         }
+    }
+}
+
+@Composable
+fun ScreenMain(modifier: Modifier = Modifier) {
+    Column{
+        Text(text = "Welcome to screen main")
     }
 }
